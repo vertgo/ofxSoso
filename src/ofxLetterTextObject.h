@@ -39,6 +39,10 @@ public:
     ~ofxLetterTextObjectLetter();
 
 	void							render();
+    void                            setToRandomCharacter();
+    void                            setToRandomCap();
+    void                            setToRandomLower();
+    void                            setToOriginal();
 
 public:
 	char							character;
@@ -46,6 +50,8 @@ public:
 	ofVec3f                         home;	
 	ofxSosoTrueTypeFont				*font;
 	float							scaleFactor;
+    char*                           randChar;
+    char*                            originalChar;
 };
 
 

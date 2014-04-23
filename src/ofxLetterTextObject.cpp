@@ -10,7 +10,8 @@ ofxLetterTextObjectLetter::ofxLetterTextObjectLetter(ofxSosoTrueTypeFont *iFont,
 	//charPointer = new char[2];
 	//charPointer[0] = iChar;
 	//charPointer[1] = 0;
-    charPointer = iChar;    //eg 0701412
+    randChar = NULL;
+    originalChar = charPointer = iChar;    //eg 0701412
 	scaleFactor = iScaleFactor;
 
 	home.set(iX, iY, 0);	
@@ -18,6 +19,42 @@ ofxLetterTextObjectLetter::ofxLetterTextObjectLetter(ofxSosoTrueTypeFont *iFont,
 	
 	hasSpecialTransparency = true;	
 
+}
+
+void ofxLetterTextObjectLetter::setToRandomCharacter(){
+    if( randChar != NULL) delete randChar;
+    if ( *originalChar >= 33 && *originalChar < 48   )
+        randChar = new char( round(ofRandom(33,48) ));
+    else if ( *originalChar >= 48 && *originalChar < 58   ){
+        randChar = new char( round(ofRandom(48,58) ));
+    }
+    else if ( *originalChar >= 65 && *originalChar < 90   ){
+        randChar = new char( round(ofRandom(65,90) ));
+    }
+    else if ( *originalChar >= 97 && *originalChar < 122   ){
+        randChar = new char( round(ofRandom(97,122) ));
+    }
+    else{
+        randChar = new char( *originalChar );
+    }
+    
+        charPointer = randChar;
+}
+
+void ofxLetterTextObjectLetter::setToRandomCap(){
+    if( randChar != NULL) delete randChar;
+    randChar = new char( round(ofRandom(65,90) ));
+    charPointer = randChar;
+}
+
+void ofxLetterTextObjectLetter::setToRandomLower(){
+    if( randChar != NULL) delete randChar;
+    randChar = new char( round(ofRandom(97,122) ));
+    charPointer = randChar;
+}
+
+void ofxLetterTextObjectLetter::setToOriginal(){
+    charPointer = originalChar;
 }
 
 ofxLetterTextObjectLetter::~ofxLetterTextObjectLetter()
