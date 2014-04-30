@@ -724,7 +724,13 @@ void ofxObject::updateMessages()
 			float startTime = messages[i]->startTime + messages[i]->startDelay;
 			float endTime = messages[i]->getFinishTime();	
 			float duration = messages[i]->duration;
-			float time = ofxMessage::interpolateTime(messages[i]->interpolation, (curTime - startTime)/duration);
+            float time;
+            if ( messages[i]->interpolation == OF_EASEFUNC){
+                time = ofxMessage::interpolateTime(messages[i]->easingFunc, (curTime - startTime)/duration);
+            }
+            else{
+                time = ofxMessage::interpolateTime(messages[i]->interpolation, (curTime - startTime)/duration);
+            }
 			float t = time;
 			float x,y,z,w;
 			//printf("t_%02d = %f\n", i, t);
@@ -1154,11 +1160,11 @@ ofxMessage* ofxObject::doMessage3f(int iID, float iDelay, float iDuration, int i
 {
 	ofVec3f *args = new ofVec3f();
 	args->set(iVal0, iVal1, iVal2);
-
+    
 	ofxMessage *message = new ofxMessage(iID, (void *)args, iInterp, iDuration, iDelay);
     message->setStartTime(curTime);
 	messages.push_back(message);
-
+    
 	return message;
 }
 
@@ -1173,6 +1179,46 @@ ofxMessage* ofxObject::doMessage4f(int iID, float iDelay, float iDuration, int i
 
 	return message;
 }
+//added by mm
+
+ofxMessage* ofxObject::doMessage1f(int iID, float iDelay, float iDuration,  EasingFunction iEaseFunc, float iVal)
+{
+	float *args = new float[1];
+	args[0] = iVal;
+    
+	ofxMessage *message = new ofxMessage(iID, (void *)args, iEaseFunc, iDuration, iDelay);
+    message->setStartTime(curTime);
+	messages.push_back(message);
+    
+	return message;
+}
+
+ofxMessage* ofxObject::doMessage3f(int iID, float iDelay, float iDuration, EasingFunction iEaseFunc, float iVal0, float iVal1, float iVal2)
+{
+	ofVec3f *args = new ofVec3f();
+	args->set(iVal0, iVal1, iVal2);
+    
+	ofxMessage *message = new ofxMessage(iID, (void *)args, iEaseFunc, iDuration, iDelay);
+    message->setStartTime(curTime);
+	messages.push_back(message);
+    
+	return message;
+}
+
+ofxMessage* ofxObject::doMessage4f(int iID, float iDelay, float iDuration, EasingFunction iEaseFunc, float iVal0, float iVal1, float iVal2, float iVal3)
+{
+	ofVec4f *args = new ofVec4f();
+	args->set(iVal0, iVal1, iVal2, iVal3);
+    
+	ofxMessage *message =new ofxMessage(iID, (void *)args, iEaseFunc, iDuration, iDelay);
+    message->setStartTime(curTime);
+	messages.push_back(message);
+    
+	return message;
+}
+
+///end mm
+
 
 ofxMessage* ofxObject::doMessageNf(int iID, float iDelay, float iDuration, int iInterp, int iPath, vector<ofVec4f> iPathPoints)
 {

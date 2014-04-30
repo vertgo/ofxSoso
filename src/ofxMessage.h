@@ -24,6 +24,7 @@ IN THE SOFTWARE.
 #pragma once
 
 #include "ofVectorMath.h"	
+#include "PennerEasing.h"
 
 
 enum{
@@ -46,7 +47,8 @@ enum{
 	OF_LINEAR,
 	OF_EASE_IN,
 	OF_EASE_OUT,
-	OF_EASE_INOUT
+	OF_EASE_INOUT,
+    OF_EASEFUNC //added by mike
 };
 
 enum{
@@ -65,6 +67,8 @@ class ofxMessage
 {
 public:
 	ofxMessage(int iID, void *iVals, int iInterpolation, float iDuration, float iDelay=0, int iPlayMode=OF_ONE_TIME_PLAY);
+    ofxMessage(int iID, void *iVals, EasingFunction iEaseFunc, float iDuration, float iDelay=0, int iPlayMode=OF_ONE_TIME_PLAY);
+    
 	ofxMessage(int iID, int iInterpolation, int iPath, vector<ofVec4f> iPathPoints, float iDuration, float iDelay=0, int iPlayMode=OF_ONE_TIME_PLAY);
 	ofxMessage(int iID, float (*iFunction)(void *), void *iArgs, float iDelay, int iPlayMode=OF_ONE_TIME_PLAY); //LM
 
@@ -73,6 +77,7 @@ public:
 	float					getFinishTime();
 	void					setStartTime(float iTime);
 	static float			interpolateTime(int iInterp, float iTime);
+    static float			interpolateTime(EasingFunction inFunction, float iTime);
 
 	void					enableMessage(bool iEnable);
 	void					setStartVals(float iX);
@@ -96,6 +101,9 @@ public:
 	int						id;
 	int						path;
 	int						interpolation;
+    //added by mike manh
+    EasingFunction          easingFunc;
+    //mm complete
 	int						playMode;
 	bool					loopDirection;
 	float					startTime,

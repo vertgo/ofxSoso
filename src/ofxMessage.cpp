@@ -10,31 +10,31 @@ ofxMessage::ofxMessage(int iID, void *iVals, int iInterpolation, float iDuration
 	path = OF_LINEAR_PATH;
 	playMode = iPlayMode;
 	loopDirection = false;
-
+    
 	//startVals = NULL;
 	//initialize all start values to OF_RELATIVE_VAL
 	if((id==OF_SCALE) || (id==OF_SETALPHA)){
 		float *val = (float *)malloc(sizeof(float));
 		val[0] = 0;
 		startVals = (void *)val;
-
+        
 		float *baseVal = (float *)malloc(sizeof(float));
 		baseVal[0] = OF_RELATIVE_VAL;
 		baseStartVals = (void *)baseVal;
-
+        
 		float *end = (float *)malloc(sizeof(float));
 		end[0] = 0;
-		endVals = (void *)end;		
+		endVals = (void *)end;
 		
 	}else if((id==OF_TRANSLATE) || (id==OF_ROTATE) || (id==OF_SETCOLOR) || (id==OF_SCALE3)){
 		ofVec3f *vals = (ofVec3f *)malloc(sizeof(ofVec3f));
 		vals->set(0,0,0);
 		startVals = (void *)vals;
-
+        
 		ofVec3f *baseVal = (ofVec3f *)malloc(sizeof(ofVec3f));
 		baseVal->set(OF_RELATIVE_VAL, OF_RELATIVE_VAL, OF_RELATIVE_VAL);
 		baseStartVals = (void *)baseVal;
-
+        
 		ofVec3f *end = (ofVec3f *)malloc(sizeof(ofVec3f));
 		end->set(0,0,0);
 		endVals = (void *)end;
@@ -43,13 +43,64 @@ ofxMessage::ofxMessage(int iID, void *iVals, int iInterpolation, float iDuration
 		baseStartVals = NULL;
 		endVals = NULL;
 	}
-
+    
 	interpolation = iInterpolation;
 	duration = iDuration;
 	startDelay = iDelay;
 	startTime = ofGetElapsedTimef();	//default to current time
 	
-	isEnabled = true;	
+	isEnabled = true;
+	isRunning = false;
+	autoDelete = true;	
+}
+
+ofxMessage::ofxMessage(int iID, void *iVals, EasingFunction iEaseFunc, float iDuration, float iDelay, int iPlayMode){
+	id = iID;
+	baseEndVals = iVals;
+	path = OF_LINEAR_PATH;
+	playMode = iPlayMode;
+	loopDirection = false;
+    
+	//startVals = NULL;
+	//initialize all start values to OF_RELATIVE_VAL
+	if((id==OF_SCALE) || (id==OF_SETALPHA)){
+		float *val = (float *)malloc(sizeof(float));
+		val[0] = 0;
+		startVals = (void *)val;
+        
+		float *baseVal = (float *)malloc(sizeof(float));
+		baseVal[0] = OF_RELATIVE_VAL;
+		baseStartVals = (void *)baseVal;
+        
+		float *end = (float *)malloc(sizeof(float));
+		end[0] = 0;
+		endVals = (void *)end;
+		
+	}else if((id==OF_TRANSLATE) || (id==OF_ROTATE) || (id==OF_SETCOLOR) || (id==OF_SCALE3)){
+		ofVec3f *vals = (ofVec3f *)malloc(sizeof(ofVec3f));
+		vals->set(0,0,0);
+		startVals = (void *)vals;
+        
+		ofVec3f *baseVal = (ofVec3f *)malloc(sizeof(ofVec3f));
+		baseVal->set(OF_RELATIVE_VAL, OF_RELATIVE_VAL, OF_RELATIVE_VAL);
+		baseStartVals = (void *)baseVal;
+        
+		ofVec3f *end = (ofVec3f *)malloc(sizeof(ofVec3f));
+		end->set(0,0,0);
+		endVals = (void *)end;
+	}else{
+		startVals = NULL;
+		baseStartVals = NULL;
+		endVals = NULL;
+	}
+    
+	easingFunc = iEaseFunc;
+	duration = iDuration;
+    interpolation = OF_EASEFUNC;
+	startDelay = iDelay;
+	startTime = ofGetElapsedTimef();	//default to current time
+	
+	isEnabled = true;
 	isRunning = false;
 	autoDelete = true;	
 }
@@ -199,35 +250,66 @@ void ofxMessage::setEndVals(float iX, float iY, float iZ, float iW)
 
 //static method for interpolating time 
 float ofxMessage::interpolateTime(int iInterp, float iTime)
-{	
+{
 	if (iTime >= 1.0f){
 		//iTime = 1.0f;
 		return 1.0f;
 	}else if(iTime < 0){
 		return 0.0f;
 	}
-
+    
 	switch (iInterp) {
-		case OF_LINEAR:		
+		case OF_LINEAR:
+            //return c*t/d + b;
 			return (iTime);
 			break;
-		case OF_EASE_OUT:		
-			return (1.0f-(iTime-1.0f)*(iTime-1.0f));		
+		case OF_EASE_OUT:
+            cout << "ofxMessage::interpolateTime for OF_EASE_OUT\n";
+            
+			return (1.0f-(iTime-1.0f)*(iTime-1.0f));
 			break;
 		case OF_EASE_IN:
 			return (iTime*iTime);
 			break;
-		case (OF_EASE_INOUT):	
+		case (OF_EASE_INOUT):
 			if (iTime <= 0.5f) {
 				return((iTime*2.0f)*(iTime*2.0f)*0.5f);
-			} 
+			}
 			else if (iTime > 0.5f) {
 				return((1.0f-((iTime-0.5f)*2.0f-1.0f)*((iTime-0.5f)*2.0f-1.0f))*0.5f + 0.5f);
 			}
-			break;	
+			break;
+        case (OF_EASEFUNC):
+        {
+            /*static float easeNone(float t,float b , float c, float d){
+             return c*t/d + b;
+             }*/
+            cout << "ofxMessage::interpolateTime for OF_EASEFUNC, shouldn't happen\n";
+            //return easingFunc( iTime, 0, 1, 1);
+        }
+            break;
 	}
-
+    
 	return iTime;
+}
+
+
+
+float ofxMessage::interpolateTime(EasingFunction iEaseFunc, float iTime)
+{
+	if (iTime >= 1.0f){
+		//iTime = 1.0f;
+		return 1.0f;
+	}else if(iTime < 0){
+		return 0.0f;
+	}
+    
+    /*static float easeNone(float t,float b , float c, float d){
+         return c*t/d + b;
+    }*/
+    //cout << "ofxMessage::interpolateTime for OF_EASEFUNC\n";
+    return iEaseFunc( iTime, 0, 1, 1);
+    
 }
 
 

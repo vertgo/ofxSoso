@@ -131,7 +131,20 @@ class ofxObject{
 	ofxMessage*						doMessage0f(int iID, float iDelay, float iDuration=0, int iInterp=OF_LINEAR);
 	ofxMessage*						doMessage1f(int iID, float iDelay, float iDuration, int iInterp, float iVal);
 	ofxMessage*						doMessage3f(int iID, float iDelay, float iDuration, int iInterp, float iVal0, float iVal1, float iVal2);
-	ofxMessage*						doMessage4f(int iID, float iDelay, float iDuration, int iInterp, float iVal0, float iVal1, float iVal2, float iVal3);
+    ofxMessage*						doMessage4f(int iID, float iDelay, float iDuration, int iInterp, float iVal0, float iVal1, float iVal2, float iVal3);
+    
+    
+    
+    //added by mm
+	ofxMessage*						doMessage1f(int iID, float iDelay, float iDuration, EasingFunction iEaseFunc, float iVal);
+	
+    ofxMessage*						doMessage3f(int iID, float iDelay, float iDuration, EasingFunction iEaseFunc, float iVal0, float iVal1, float iVal2); //same as above but you pass in a penner equation
+    ofxMessage*						doMessage4f(int iID, float iDelay, float iDuration, EasingFunction iEaseFunc, float iVal0, float iVal1, float iVal2, float iVal3);
+    
+    //mm complete
+
+    
+    
 	ofxMessage*						doMessageNf(int iID, float iDelay, float iDuration, int iInterp, int iPath, vector<ofVec4f> iPathPoints);
 	void							stopMessages(int iMessageType=-1);
 		
