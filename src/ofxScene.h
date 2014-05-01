@@ -122,7 +122,7 @@ private:
 	GLenum					shadingModel;
 
 public:
-	static float			*defaultMatrix;
+	static ofMatrix4x4*			defaultMatrix;
 	static ofxObjectMaterial *defaultMaterial;
 	
 

@@ -71,7 +71,7 @@ class ofxObject{
 	
 	virtual void					predraw();
 	virtual void					postdraw();
-	void							draw(ofxObjectMaterial *iMaterial, float *iMatrix, int iSelect=OF_RENDER_ALL, bool iDrawAlone=false);		//v4.0 added material arg
+	void							draw(ofxObjectMaterial *iMaterial, ofMatrix4x4* iMatrix, int iSelect=OF_RENDER_ALL, bool iDrawAlone=false);		//v4.0 added material arg
 	virtual void					render();
 	void							idleBase(float iTime);
 	virtual void					idle(float iTime){};	
@@ -104,8 +104,8 @@ class ofxObject{
 	
 	float*							getMatrix();
 	float*							getLocalMatrix();
-	virtual float*					updateMatrix(float *iParentMatrix);
-	void							updateMatrices(float *iParentMatrix = NULL);
+	virtual ofMatrix4x4*			updateMatrix(ofMatrix4x4* iParentMatrix);
+	void							updateMatrices(ofMatrix4x4* iParentMatrix);
 	void							updateLocalMatrix();	
 	
     GLuint                          getDisplayList(){ return displayList; } //eg 070112
@@ -153,7 +153,7 @@ class ofxObject{
 	void							stopMessages(int iMessageType=-1);
 		
 	static void						Mul(float *source1, float *source2, float *dest);
-	static void						LoadIdentity(float *dest);
+	static void						LoadIdentity(ofMatrix4x4 &dest);
 	static void						Transpose(float *source, float *dest);	
 
 	
@@ -172,8 +172,10 @@ protected:
 	GLuint							displayList;
     bool                            displayListFlag;    //eg 070112
 	
-	float							*localMatrix;
-	float							*matrix;	
+    ofMatrix4x4*                     localMatrix;
+    ofMatrix4x4*                     matrix;
+	//float							*localMatrix;
+	//float							*matrix;
 	//ofxObjectMaterial				*material,
 		//							*drawMaterial;
 	

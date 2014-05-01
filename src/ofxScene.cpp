@@ -23,7 +23,7 @@ ofxViewportData::~ofxViewportData(){}
 
 
 //class ofxScene _______________________________________________________________________________
-float* ofxScene::defaultMatrix = NULL;
+ofMatrix4x4* ofxScene::defaultMatrix = NULL;
 ofxObjectMaterial* ofxScene::defaultMaterial = NULL;
 
 ofxScene::ofxScene(int w, int h)
@@ -55,7 +55,7 @@ ofxScene::ofxScene(int w, int h)
 	centerOffset.set(sceneWidth/2.0f, sceneHeight/2.0f, 0);
 
 	if(!defaultMatrix){
-		defaultMatrix = (float *)malloc(sizeof(float) * 16);
+		/*defaultMatrix = (float *)malloc(sizeof(float) * 16);
 		defaultMatrix[0] = 1.0;
 		defaultMatrix[1] = 0;
 		defaultMatrix[2] = 0;
@@ -74,7 +74,8 @@ ofxScene::ofxScene(int w, int h)
 		defaultMatrix[12] = 0;
 		defaultMatrix[13] = 0;
 		defaultMatrix[14] = 0;
-		defaultMatrix[15] = 1.0;
+		defaultMatrix[15] = 1.0;*/
+        defaultMatrix = new ofMatrix4x4(); //already instantiated to the identity matrix
 	}
 	
 	if(!defaultMaterial)

@@ -31,12 +31,15 @@ ofxObject::ofxObject(){
 	id = numObjects++;
 	
 	//transformation matrix
-	matrix = (float*)malloc(sizeof(float)*16);
-	LoadIdentity(matrix);
+	//matrix = (float*)malloc(sizeof(float)*16);
+	//LoadIdentity(matrix);
 	//matrixTmp = (float*)malloc(sizeof(float)*16);
-	localMatrix = (float*)malloc(sizeof(float)*16);
-	LoadIdentity(localMatrix);
-	
+	//localMatrix = (float*)malloc(sizeof(float)*16);
+	//LoadIdentity(localMatrix);
+    matrix = new ofMatrix4x4();
+	localMatrix = new ofMatrix4x4();
+    
+    
 	material = new ofxObjectMaterial();
 	drawMaterial = new ofxObjectMaterial();
     inheritColor = false;   // SK Added color inheritence defaults to false
@@ -104,9 +107,8 @@ ofxObject::~ofxObject()
 	//if (rotationMatrix != NULL) free(rotationMatrix);
 	//if (rotationMatrixTmp != NULL) free(rotationMatrixTmp);;	
 	
-	if (matrix) free(matrix); //LM 070612
-	if (localMatrix) free(localMatrix);
-	
+	if (matrix != NULL) delete matrix;
+	if (localMatrix != NULL) delete localMatrix;
 }
 
 int ofxObject::addChild(ofxObject *child)
@@ -151,19 +153,19 @@ void ofxObject::removeChild(ofxObject *child)
 
 void ofxObject::updateLocalMatrix()
 {	
-	static float cX, sX, cY, sY, cZ, sZ;	//for xyz rotation	
+	//static float cX, sX, cY, sY, cZ, sZ;	//for xyz rotation
 		
 	//calculate cos + sin for rotations ONCE
-	cX = (float)cos(xyzRot[0] * DEG_TO_RAD);
+	/*cX = (float)cos(xyzRot[0] * DEG_TO_RAD);
 	sX = (float)sin(xyzRot[0] * DEG_TO_RAD);
 	cY = (float)cos(xyzRot[1] * DEG_TO_RAD);
 	sY = (float)sin(xyzRot[1] * DEG_TO_RAD);
 	cZ = (float)cos(xyzRot[2] * DEG_TO_RAD);
 	sZ = (float)sin(xyzRot[2] * DEG_TO_RAD);
-	
+	*/
 	//build composite matrix for XYZ rotation:
 	//order of transformations:  scale, rotateX, rotateY, rotateZ, translate	
-	localMatrix[0] = scale.x * (cY*cZ);
+	/*localMatrix[0] = scale.x * (cY*cZ);
 	localMatrix[4] = scale.y * (-cY*sZ);
 	localMatrix[8] = scale.z * (sY);
 	
@@ -174,17 +176,23 @@ void ofxObject::updateLocalMatrix()
 	localMatrix[2] = scale.x * (-cX*sY*cZ + sX*sZ);
 	localMatrix[6] = scale.y * (cX*sY*sZ + sX*cZ);
 	localMatrix[10] = scale.z * (cX*cY);
-	
-
+	*/
+    localMatrix->makeIdentityMatrix();
+    localMatrix->translate( registration );
+    localMatrix->scale(scale.x, scale.x, scale.z);
+    localMatrix->rotate( xyzRot[0], 1, 0, 0);
+    localMatrix->rotate( xyzRot[1], 0, 1, 0);
+    localMatrix->rotate( xyzRot[2], 0, 0, 1);
+    localMatrix->translate( -registration );
 	localMatrixDirty = false;
 }
 
 
 
 
-void ofxObject::updateMatrices(float *iParentMatrix)
+void ofxObject::updateMatrices(ofMatrix4x4 *iParentMatrix)
 {	
-	static float *mat = NULL;
+	static ofMatrix4x4 *mat = NULL;
 
 	if (iParentMatrix != NULL) {
 		mat = iParentMatrix;
@@ -192,12 +200,11 @@ void ofxObject::updateMatrices(float *iParentMatrix)
 	else {
 		// create root matrix		
 		if (mat == NULL) {
-			mat = (float *)malloc(sizeof(float) * 16);
-			LoadIdentity(mat);			
-		}
+			mat = new ofMatrix4x4();
+        }
 	}
 	
-	float *matrix2 = updateMatrix(mat);
+	ofMatrix4x4* matrix2 = updateMatrix(mat);
 
 	for (unsigned int i = 0; i < children.size(); i++) {
 		children[i]->updateMatrices(matrix2);
@@ -205,18 +212,20 @@ void ofxObject::updateMatrices(float *iParentMatrix)
 }
 
 
-float* ofxObject::updateMatrix(float *iParentMatrix)
+ofMatrix4x4* ofxObject::updateMatrix(ofMatrix4x4* iParentMatrix)
 {	
 	// if the object has multiple parents, the hierarchy tree matrix needs to be set to dirty, using mMatrixDirty.
 	if (parents.size() > 1) matrixDirty = true;
-
+    
+    //matrix->makeIdentityMatrix();
 	if (matrixDirty  ||  localMatrixDirty  || alwaysMatrixDirty) {
 		if (localMatrixDirty) {			
 			updateLocalMatrix();
 		}
 
 		//matrix multiplication
-		Mul(localMatrix, iParentMatrix, matrix);
+		//Mul(localMatrix, iParentMatrix, matrix);
+        *matrix = *localMatrix * *iParentMatrix; //this seems like a bit too much dereferencing //mm
         
 
 		/*
@@ -227,7 +236,8 @@ float* ofxObject::updateMatrix(float *iParentMatrix)
 			matrix[8], matrix[9], matrix[10], matrix[11],
 			matrix[12], matrix[13], matrix[14], matrix[15]);
 		*/
-
+        
+        matrix->translate( xyz );
 		// set matrix dirty flags of all children
 		for (unsigned int i = 0; i < children.size(); i++) 
 			children[i]->matrixDirty = true;			
@@ -299,7 +309,7 @@ void ofxObject::idleBase(float iTime)
 
 //----------------------------------------------------------
 //void ofxObject::draw(float *_matrix){
-void ofxObject::draw(ofxObjectMaterial *iMaterial, float *iMatrix, int iSelect, bool iDrawAlone)	
+void ofxObject::draw(ofxObjectMaterial *iMaterial, ofMatrix4x4* iMatrix, int iSelect, bool iDrawAlone)
 {
 	//if(id == 1) printf("i am a circle %f - %f, %f, %f\n", ofGetElapsedTimef(), color.x, color.y, color.z);
 
@@ -321,7 +331,7 @@ void ofxObject::draw(ofxObjectMaterial *iMaterial, float *iMatrix, int iSelect, 
 		
 		//printf("ofxObject::draw()\n");		
 		if(!iDrawAlone){
-			float *mat = updateMatrix(iMatrix);					
+			ofMatrix4x4* mat = updateMatrix(iMatrix);
 			ofxObjectMaterial *m = updateMaterial(iMaterial);	//v4.0		
 
 			predraw();
@@ -374,7 +384,7 @@ void ofxObject::predraw()
 		prevLit = isLit;
 	}
 	
-	glLoadMatrixf(matrix);
+	glLoadMatrixf(matrix->getPtr());
 	
 	/*
 	//Older way of doing transformations.
@@ -571,9 +581,10 @@ void ofxObject::setTrans(float x, float y, float z)
 {
 	xyz.set(x, y, z);
     
+    /*
 	localMatrix[12] = xyz[0];
 	localMatrix[13] = xyz[1];
-	localMatrix[14] = xyz[2];
+	localMatrix[14] = xyz[2];*/
 	matrixDirty = true;
 }
 
@@ -581,10 +592,10 @@ void ofxObject::setTrans(float x, float y, float z)
 void ofxObject::setTrans(ofVec3f vec)
 {
 	xyz = vec;
-    
+    /*
 	localMatrix[12] = xyz[0];
 	localMatrix[13] = xyz[1];
-	localMatrix[14] = xyz[2];
+	localMatrix[14] = xyz[2];*/
 	matrixDirty = true;
 }
 
@@ -713,8 +724,10 @@ void ofxObject::Transpose(float *source, float *dest)
 	
 }
 
-void ofxObject::LoadIdentity(float *dest)
+void ofxObject::LoadIdentity(ofMatrix4x4 &dest)
 {
+    dest.makeIdentityMatrix();
+    /*
 	dest[0] = 1;
 	dest[1] = 0;
 	dest[2] = 0;
@@ -733,7 +746,7 @@ void ofxObject::LoadIdentity(float *dest)
 	dest[12] = 0;
 	dest[13] = 0;
 	dest[14] = 0;
-	dest[15] = 1;
+	dest[15] = 1;*/
 }
 
 
