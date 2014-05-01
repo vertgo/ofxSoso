@@ -14,9 +14,13 @@ ofxLetterTextAnimator::ofxLetterTextAnimator( ofxSosoTrueTypeFont *iFont, char *
 }
 
 void ofxLetterTextAnimator::addAlphaFlickerAcross(float inWait, float inDelay, float inFlickerTime, float inAlpha, bool inRandom ){
-    for( int i = 0; i < letters.size(); i++ ){
+    vector<ofxLetterTextObjectLetter*>	lettersCopy = letters;
+    if ( inRandom )
+        random_shuffle( lettersCopy.begin(), lettersCopy.end() );
+    
+    for( int i = 0; i < lettersCopy.size(); i++ ){
         
-        ofxLetterTextObjectLetter* curLetter = letters[i];
+        ofxLetterTextObjectLetter* curLetter = lettersCopy[i];
         
         curLetter->doMessage1f( OF_SETALPHA, inWait + i*inDelay, inFlickerTime/2, OF_LINEAR, inAlpha * 255 );
         curLetter->doMessage1f( OF_SETALPHA, inWait + i*inDelay+inFlickerTime/2, inFlickerTime/2, OF_LINEAR, 255 );
@@ -71,6 +75,63 @@ void ofxLetterTextAnimator::scrambleAcross(float inWait, float inDelay, bool inR
         
     }
 }
+
+void ofxLetterTextAnimator::popLetters(float inWait, float inDelay, float initSize, bool inRandom){
+    
+    vector<ofxLetterTextObjectLetter*>	lettersCopy = letters;
+    if ( inRandom )
+        random_shuffle( lettersCopy.begin(), lettersCopy.end() );
+    for( int i = 0; i < lettersCopy.size(); i++ ){
+        lettersCopy[ i ]->setScale(initSize);
+    }
+    cout << "popLetters" <<endl;
+    for( int i = 0; i < lettersCopy.size(); i++ ){
+        
+        ofxLetterTextObjectLetter* curLetter = lettersCopy[i];
+        curLetter->doMessage1f(OF_SCALE, inWait + i* inDelay, 1.0, &PennerEasing::elasticEaseOut, 1.f);
+
+        
+    }
+}
+
+void ofxLetterTextAnimator::dropLetters(float inWait, float inDelay, float inDropTime, float initHeight, bool inRandom, bool startFromBack){
+    
+    vector<ofxLetterTextObjectLetter*>	lettersCopy = letters;
+    if ( startFromBack ){ //that's what she said
+        reverse( lettersCopy.begin(), lettersCopy.end() );
+    }
+    else if ( inRandom )
+        random_shuffle( lettersCopy.begin(), lettersCopy.end() );
+    for( int i = 0; i < lettersCopy.size(); i++ ){
+        lettersCopy[ i ]->setTrans(lettersCopy[i]->home[0],lettersCopy[i]->home[1] + initHeight,lettersCopy[i]->home[2]);
+    }
+    
+    cout << "dropLetters" <<endl;
+    for( int i = 0; i < lettersCopy.size(); i++ ){
+        
+        ofxLetterTextObjectLetter* curLetter = lettersCopy[i];
+        curLetter->doMessage3f(OF_TRANSLATE, inWait + i* inDelay, inDropTime, &PennerEasing::quadEaseOut,lettersCopy[i]->home[0],lettersCopy[i]->home[1],lettersCopy[i]->home[2] );
+        
+    }
+}
+
+/*
+void ofxLetterTextAnimator::popWords(float inWait, float inDelay, float initSize, bool inRandom){
+    
+    vector<wordBlock>	wordsCopy = words;
+    if ( inRandom )
+        random_shuffle( wordsCopy.begin(), wordsCopy.end() );
+    for( int i = 0; i < wordsCopy.size(); i++ ){
+        vector<ofVec2f> curPositions= wordsCopy[ i ].charPositions;
+    }
+
+    for( int i = 0; i < lettersCopy.size(); i++ ){
+        
+        ofxLetterTextObjectLetter* curLetter = lettersCopy[i];
+        curLetter->doMessage1f(OF_SCALE, inWait + i* inDelay, 1.0, &PennerEasing::elasticEaseOut, 1.f);
+        
+    }
+}*/
 
 
 void ofxLetterTextAnimator::unscrambleAcross(float inWait, float inDelay, bool inRandom){
@@ -132,7 +193,7 @@ void ofxLetterTextAnimator::randomScrambleThenUnscramble( int inScrambles, float
             cout <<", unscramble:" << waitTime <<endl;
             scrambleMessage = new ofxMessage(OF_FUNCTION, &unscramble, curLetter, waitTime, OF_ONE_TIME_PLAY);
             curLetter->doMessage(scrambleMessage);
-        
-        
     }
+    
+    
 }

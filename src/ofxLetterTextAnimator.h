@@ -24,8 +24,10 @@ public:
     void unscrambleAcross(float inWait, float inDelay, bool inRandom = false );
     
     void randomScrambleThenUnscramble( int inScrambles, float inWait, float inDelay, float inScrambleDelay , bool inRandom = true, bool blink = false, float blinkTime = 0 );
-    //TODO delete this
-    float setToRandomCharacter( void* );
+    
+    void popLetters(float inWait, float inDelay, float initSize = 0.f, bool inRandom = false);
+    void dropLetters(float inWait, float inDelay, float inDropTime, float initHeight = 1000.f, bool inRandom = false, bool startFromBack = false);
+    //void popWords(float inWait, float inDelay, float initSize = 0.f, bool inRandom = false);
     
     
     void bounceUp();

@@ -78,6 +78,10 @@ class ofxObject{
 	
 	void							setTrans(ofVec3f vec);
 	void							setTrans(float x, float y, float z);
+    //added by mm
+	void							setReg(ofVec3f vec);
+	void							setReg(float x, float y, float z);
+    //mm complete
 	ofVec3f                         getTrans();
 	
 	void							setRot(ofVec3f r);
@@ -181,6 +185,8 @@ protected:
 	
 	ofVec3f							xyzRot,
 									xyz,
+                                    //added by mike
+                                    registration,
 									scale;	
 	//ofVec4f						color;	//v4.0
 	bool							hasSpecialTransparency;

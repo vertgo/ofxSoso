@@ -46,6 +46,7 @@ ofxObject::ofxObject(){
 
 	xyzRot.set(0., 0., 0.);
 	xyz.set(0.,0.,0.);
+    registration.set( 0.f, 0.f, 0.f);
 	scale.set(1.,1.,1.);    	
 	isLit = true;
 	
@@ -216,6 +217,7 @@ float* ofxObject::updateMatrix(float *iParentMatrix)
 
 		//matrix multiplication
 		Mul(localMatrix, iParentMatrix, matrix);
+        
 
 		/*
 		if(id==1)
@@ -568,7 +570,7 @@ ofVec3f ofxObject::getTrans()
 void ofxObject::setTrans(float x, float y, float z)
 {
 	xyz.set(x, y, z);
-
+    
 	localMatrix[12] = xyz[0];
 	localMatrix[13] = xyz[1];
 	localMatrix[14] = xyz[2];
@@ -577,13 +579,34 @@ void ofxObject::setTrans(float x, float y, float z)
 
 
 void ofxObject::setTrans(ofVec3f vec)
-{ 
-	xyz = vec; 	
-
+{
+	xyz = vec;
+    
 	localMatrix[12] = xyz[0];
 	localMatrix[13] = xyz[1];
 	localMatrix[14] = xyz[2];
 	matrixDirty = true;
+}
+
+void ofxObject::setReg(float x, float y, float z)
+{
+	registration.set(x, y, z);
+    
+	//localMatrix[12] = xyz[0];
+	//localMatrix[13] = xyz[1];
+	//localMatrix[14] = xyz[2];
+	localMatrixDirty = true;
+}
+
+
+void ofxObject::setReg(ofVec3f vec)
+{
+	registration = vec;
+    
+	//localMatrix[12] = xyz[0];
+	//localMatrix[13] = xyz[1];
+	//localMatrix[14] = xyz[2];
+	localMatrixDirty = true;
 }
 
 
