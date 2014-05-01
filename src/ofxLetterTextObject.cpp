@@ -17,7 +17,7 @@ ofxLetterTextObjectLetter::ofxLetterTextObjectLetter(ofxSosoTrueTypeFont *iFont,
 	home.set(iX, iY, 0);
 	letterWidth = iFont->getCharWidth( *iChar) * iScaleFactor;
     letterHeight = iFont->getCharWidth( *iChar) * iScaleFactor;
-    setReg(letterWidth/2, 0, 0); //what could possibly go wrong?
+    setReg(letterWidth/2, letterHeight/2, 0); //what could possibly go wrong?
 	font = iFont;
 	
 	hasSpecialTransparency = true;	

@@ -28,9 +28,12 @@ public:
     void popLetters(float inWait, float inDelay, float initSize = 0.f, bool inRandom = false);
     void dropLetters(float inWait, float inDelay, float inDropTime, float initHeight = 1000.f, bool inRandom = false, bool startFromBack = false);
     //void popWords(float inWait, float inDelay, float initSize = 0.f, bool inRandom = false);
+    void fireLetters(float inWait, float inDelay, float inDropTime, float initHeight = 1000.f, bool inRandom = false, bool startFromBack = false);
     
     
     void bounceUp();
+    
+    void hideAll();
 private:
     
 };

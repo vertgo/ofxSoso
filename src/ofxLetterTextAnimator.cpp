@@ -115,6 +115,27 @@ void ofxLetterTextAnimator::dropLetters(float inWait, float inDelay, float inDro
     }
 }
 
+void ofxLetterTextAnimator::fireLetters(float inWait, float inDelay, float inDropTime, float initHeight, bool inRandom, bool startFromBack){
+    
+    vector<ofxLetterTextObjectLetter*>	lettersCopy = letters;
+    if ( startFromBack ){ //that's what she said
+        reverse( lettersCopy.begin(), lettersCopy.end() );
+    }
+    else if ( inRandom )
+        random_shuffle( lettersCopy.begin(), lettersCopy.end() );
+    for( int i = 0; i < lettersCopy.size(); i++ ){
+        lettersCopy[ i ]->setTrans(lettersCopy[i]->home[0],lettersCopy[i]->home[1] ,lettersCopy[i]->home[2] + initHeight);
+    }
+    
+    cout << "dropLetters" <<endl;
+    for( int i = 0; i < lettersCopy.size(); i++ ){
+        
+        ofxLetterTextObjectLetter* curLetter = lettersCopy[i];
+        curLetter->doMessage3f(OF_TRANSLATE, inWait + i* inDelay, inDropTime, &PennerEasing::quintEaseOut,lettersCopy[i]->home[0],lettersCopy[i]->home[1],lettersCopy[i]->home[2] );
+        
+    }
+}
+
 /*
 void ofxLetterTextAnimator::popWords(float inWait, float inDelay, float initSize, bool inRandom){
     
@@ -195,5 +216,10 @@ void ofxLetterTextAnimator::randomScrambleThenUnscramble( int inScrambles, float
             curLetter->doMessage(scrambleMessage);
     }
     
-    
+}
+
+void ofxLetterTextAnimator::hideAll(){
+    for( int i = 0; i < letters.size(); i++ ){
+        letters[i]->hide();
+    }
 }
