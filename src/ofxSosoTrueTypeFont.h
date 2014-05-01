@@ -64,6 +64,12 @@ public:
 
 	//overridden for special Unicode character replacements	
 	float 					stringWidth(string s);
+    
+    //added by Mike Manh
+    float                   getCharWidth( char iChar );
+    float                   getCharHeight( char iChar );
+    //mm complete
+    
 	ofRectangle				getStringBoundingBox(string c, float x, float y);
     
 	//new methods

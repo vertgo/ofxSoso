@@ -169,6 +169,10 @@ protected:
     float                           pointSize,
                                     leading;
     float                           scaleFactor;
+    //added by Mike
+    float                           getCharWidth( char inChar);
+    float                           getCharHeight( char inChar);
+    
     
     wordBlock                       blankSpaceWord;
     wordBlock                       newLineWord; 

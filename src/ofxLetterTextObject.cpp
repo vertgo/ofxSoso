@@ -14,7 +14,10 @@ ofxLetterTextObjectLetter::ofxLetterTextObjectLetter(ofxSosoTrueTypeFont *iFont,
     originalChar = charPointer = iChar;    //eg 0701412
 	scaleFactor = iScaleFactor;
 
-	home.set(iX, iY, 0);	
+	home.set(iX, iY, 0);
+	letterWidth = iFont->getCharWidth( *iChar) * iScaleFactor;
+    letterHeight = iFont->getCharWidth( *iChar) * iScaleFactor;
+    setReg(letterWidth/2, 0, 0); //what could possibly go wrong?
 	font = iFont;
 	
 	hasSpecialTransparency = true;	
@@ -129,9 +132,13 @@ void ofxLetterTextObject::rebuildLetters()
 				//Make letters.
 				for(int p=0; p < words[currentWordID].charPositions.size(); p++){
 					//Add word position to char position.
-					ofVec3f pos((words[currentWordID].pos.x + words[currentWordID].charPositions[p].x) * scaleFactor, 
-								 (words[currentWordID].pos.y + words[currentWordID].charPositions[p].y) * scaleFactor,
-								 0);
+                    
+                    
+                    float xLocation = (words[currentWordID].pos.x + words[currentWordID].charPositions[p].x) * scaleFactor;
+                    float yLocation = (words[currentWordID].pos.y + words[currentWordID].charPositions[p].y) * scaleFactor;
+                    
+                    
+					ofVec3f pos( xLocation,	yLocation, 0);
 					
                     //Check for special unicode sequences, as defined in buildMappedChars() //eg 0701412
                     char *cSeq = NULL; //getFont()->getMappedCharSequence(words[currentWordID].rawWord, p);
@@ -147,6 +154,7 @@ void ofxLetterTextObject::rebuildLetters()
 					letter->setTrans(pos.x, pos.y, pos.z);
 					letter->setColor(words[currentWordID].color.r, words[currentWordID].color.g, words[currentWordID].color.b, words[currentWordID].color.a);	//Gotta grab word color or else it gets reset to white.					
 					letters.push_back(letter);
+                    letter->letterWidth =
 					addChild(letter);								
 				}
 			}

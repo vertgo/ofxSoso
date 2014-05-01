@@ -178,12 +178,12 @@ void ofxObject::updateLocalMatrix()
 	localMatrix[10] = scale.z * (cX*cY);
 	*/
     localMatrix->makeIdentityMatrix();
-    localMatrix->translate( registration );
+    localMatrix->translate( -registration );
     localMatrix->scale(scale.x, scale.x, scale.z);
     localMatrix->rotate( xyzRot[0], 1, 0, 0);
     localMatrix->rotate( xyzRot[1], 0, 1, 0);
     localMatrix->rotate( xyzRot[2], 0, 0, 1);
-    localMatrix->translate( -registration );
+    localMatrix->translate( registration );
 	localMatrixDirty = false;
 }
 

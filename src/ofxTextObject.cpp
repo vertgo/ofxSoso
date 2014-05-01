@@ -1011,3 +1011,14 @@ ofxSosoTrueTypeFont* ofxTextObject::getFont(char *iFontName)
 	}
 	return NULL;
 }
+
+//added by Mike Manh
+
+
+float ofxTextObject::getCharWidth(char inChar){
+    return( font->getCharWidth(inChar) * scaleFactor);
+}
+
+float ofxTextObject::getCharHeight(char inChar){
+    return( font->getCharHeight(inChar) * scaleFactor);
+}

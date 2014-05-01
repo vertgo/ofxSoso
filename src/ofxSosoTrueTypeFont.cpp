@@ -1049,7 +1049,17 @@ vector <ofVec2f>  ofxSosoTrueTypeFont::getCharPositions(string c, float x, float
 	
 	return charPositions;
 }
+//added by Mike Manh
+float ofxSosoTrueTypeFont::getCharWidth(char iChar){
+    int cy = iChar - NUM_CHARACTER_TO_START; //i thiiiiink this gives us the char
+    return cps[cy].width; //or maybe setWidth?
+}
 
+float ofxSosoTrueTypeFont::getCharHeight(char iChar){
+    int cy = iChar - NUM_CHARACTER_TO_START; //i thiiiiink this gives us the char
+    return cps[cy].height; //or maybe setWidth?
+}
+//mm complete
 
 float ofxSosoTrueTypeFont::stringWidth(string c)
 {

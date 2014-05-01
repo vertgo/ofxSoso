@@ -47,11 +47,13 @@ public:
 public:
 	char							character;
 	char							*charPointer;
-	ofVec3f                         home;	
+	ofVec3f                         home;
 	ofxSosoTrueTypeFont				*font;
 	float							scaleFactor;
     char*                           randChar;
     char*                            originalChar;
+    float                           letterWidth;
+    float                           letterHeight;
 };
 
 
